@@ -1,0 +1,14 @@
+# Node
+node_modules/
+
+# React build
+build/
+
+# Env files
+.env
+
+# TS build
+dist/
+
+# Test coverage
+coverage/
