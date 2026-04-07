@@ -24,9 +24,17 @@ const Home: React.FC = () => {
         "http://localhost:5000/api/cv/upload",
         formData,
       );
+      console.log("Structured CV JSON:", res.data.cvData);
       setUploadMessage(`CV uploaded successfully. File ID: ${res.data.fileId}`);
     } catch (err) {
-      setUploadMessage("Upload failed. Please try again.");
+      if (axios.isAxiosError(err)) {
+        const apiError =
+          (err.response?.data as { error?: string } | undefined)?.error ||
+          err.message;
+        setUploadMessage(apiError);
+      } else {
+        setUploadMessage("Upload failed. Please try again.");
+      }
       console.error(err);
     } finally {
       setIsUploading(false);
