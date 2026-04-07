@@ -1,11 +1,103 @@
 import React from "react";
+import axios from "axios";
 import CVUpload from "./pages/home";
+import Loader from "./components/ui/loader";
+import DemoPage from "./pages/demo";
+
+type AppPage = "home" | "loading" | "demo";
 
 function App() {
+  const [page, setPage] = React.useState<AppPage>("home");
+  const [errorMessage, setErrorMessage] = React.useState("");
+  const [cvData, setCvData] = React.useState<unknown>(null);
+  const [fileId, setFileId] = React.useState("");
+
+  const handleStartInterview = async (file: File) => {
+    const formData = new FormData();
+    formData.append("cv", file);
+
+    setErrorMessage("");
+    setPage("loading");
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/cv/upload",
+        formData,
+      );
+
+      console.log("Structured CV JSON:", res.data.cvData);
+      setCvData(res.data.cvData);
+      setFileId(res.data.fileId || "");
+      setPage("demo");
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const apiError =
+          (err.response?.data as { error?: string } | undefined)?.error ||
+          err.message;
+        setErrorMessage(apiError);
+      } else {
+        setErrorMessage("Upload failed. Please try again.");
+      }
+
+      setPage("home");
+      console.error(err);
+    }
+  };
+
+  if (page === "loading") {
+    return (
+      <div className="loading-page">
+        <div className="loading-inner">
+          <Loader />
+          <p>Processing your CV...</p>
+        </div>
+
+        <style>{`
+          .loading-page {
+            min-height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .loading-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            color: #d1d5db;
+            font-family: 'Poppins', sans-serif;
+          }
+
+          .loading-inner p {
+            margin: 0;
+            font-size: 14px;
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (page === "demo") {
+    return (
+      <DemoPage
+        cvData={cvData}
+        fileId={fileId}
+        onGoHome={() => {
+          setPage("home");
+          setErrorMessage("");
+        }}
+      />
+    );
+  }
+
   return (
-    <div>
-      <CVUpload />
-    </div>
+    <CVUpload
+      onStartInterview={handleStartInterview}
+      errorMessage={errorMessage}
+    />
   );
 }
 

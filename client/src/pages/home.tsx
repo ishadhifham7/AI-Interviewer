@@ -1,12 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import axios from "axios";
 import { FileUpload } from "../components/ui/file-upload";
 
-const Home: React.FC = () => {
+interface HomeProps {
+  onStartInterview: (file: File) => void;
+  errorMessage?: string;
+}
+
+const Home: React.FC<HomeProps> = ({ onStartInterview, errorMessage = "" }) => {
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState<string>("");
 
   const handleUpload = async () => {
     if (!file) {
@@ -14,31 +16,7 @@ const Home: React.FC = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("cv", file);
-
-    try {
-      setIsUploading(true);
-      setUploadMessage("");
-      const res = await axios.post(
-        "http://localhost:5000/api/cv/upload",
-        formData,
-      );
-      console.log("Structured CV JSON:", res.data.cvData);
-      setUploadMessage(`CV uploaded successfully. File ID: ${res.data.fileId}`);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const apiError =
-          (err.response?.data as { error?: string } | undefined)?.error ||
-          err.message;
-        setUploadMessage(apiError);
-      } else {
-        setUploadMessage("Upload failed. Please try again.");
-      }
-      console.error(err);
-    } finally {
-      setIsUploading(false);
-    }
+    onStartInterview(file);
   };
 
   const [files, setFiles] = useState<File[]>([]);
@@ -46,7 +24,6 @@ const Home: React.FC = () => {
     const selectedFile = uploadedFiles[0] || null;
     setFile(selectedFile);
     setFiles(uploadedFiles);
-    setUploadMessage("");
     console.log(uploadedFiles);
   };
 
@@ -68,12 +45,12 @@ const Home: React.FC = () => {
           <button
             className="upload-btn"
             onClick={handleUpload}
-            disabled={isUploading}
+            disabled={!file}
           >
-            {isUploading ? "Uploading..." : "Start Interview"}
+            Start Interview
           </button>
 
-          {uploadMessage && <p className="upload-message">{uploadMessage}</p>}
+          {errorMessage && <p className="upload-message">{errorMessage}</p>}
         </div>
       </div>
 

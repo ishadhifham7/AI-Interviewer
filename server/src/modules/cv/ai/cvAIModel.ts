@@ -80,11 +80,24 @@ export class CVModel {
       ) as Error & {
         statusCode?: number;
       };
+      const errorMessage = String(error?.message || "");
 
-      if (error?.status === 429) {
+      if (
+        error?.status === 429 ||
+        errorMessage.includes("RESOURCE_EXHAUSTED") ||
+        errorMessage.includes("quota")
+      ) {
         aiError.statusCode = 503;
         aiError.message =
           "AI service quota exceeded. Please check Gemini API billing/quota and retry.";
+      } else if (
+        error?.status === 503 ||
+        errorMessage.includes("UNAVAILABLE") ||
+        errorMessage.includes("high demand")
+      ) {
+        aiError.statusCode = 503;
+        aiError.message =
+          "Gemini model is temporarily unavailable due to high demand. Please retry in a few moments.";
       } else if (error?.status === 404) {
         aiError.statusCode = 500;
         aiError.message =
