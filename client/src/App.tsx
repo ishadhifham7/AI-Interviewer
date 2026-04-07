@@ -1,10 +1,9 @@
 import React from "react";
-import CVUpload from "./components/CVUploads";
+import CVUpload from "./pages/home";
 
 function App() {
   return (
     <div>
-      <h1>AI Interviewer</h1>
       <CVUpload />
     </div>
   );
