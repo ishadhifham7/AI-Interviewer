@@ -47,7 +47,7 @@ const Home: React.FC<HomeProps> = ({ onStartInterview, errorMessage = "" }) => {
             onClick={handleUpload}
             disabled={!file}
           >
-            Start Interview
+            Upload CV
           </button>
 
           {errorMessage && <p className="upload-message">{errorMessage}</p>}
