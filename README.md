@@ -29,7 +29,7 @@ AI Interview System is an AI-powered platform designed to simulate real intervie
 
 - Frontend: React.js  
 - Backend: Node.js / Express  
-- AI: Gemini 3.1 Flash 
+- AI: Gemma 4 / Gemini 3.1 Flash 
 - Database: Firebase
 - APIs: REST APIs  
 
@@ -37,13 +37,13 @@ AI Interview System is an AI-powered platform designed to simulate real intervie
 
 ## 🤖 AI Integration
 
-The system uses Gemini 3.1 Flash to:
+The system uses a dual-model AI pipeline, combining Gemini and Gemma 4 for specialized roles:
 
-- Generate context-aware interview questions  
-- Evaluate user responses  
-- Maintain conversational flow  
+- Gemini 3.1 Flash is used to parse and analyze user CV data, converting it into structured JSON that captures relevant candidate information
+- Gemma 4 acts as the core interview engine, using this structured data to generate context-aware questions, evaluate responses, and maintain a realistic interview flow
+- The separation ensures clear responsibility between data processing and conversational reasoning, improving control and output quality
 
-Voice responses are processed using speech-to-text before being analyzed by the AI model.
+Voice responses are processed using speech-to-text before being passed into the interview pipeline for analysis.
 
 ---
 
@@ -55,9 +55,3 @@ The platform supports voice-based responses, allowing users to simulate real int
 - Enables hands-free interaction  
 - Creates a more realistic interview experience  
 
----
-
-## 🚀 Deployment
-
-- Backend designed for scalable API-based deployment  
-- Supports real-time interaction through chat-based interface  
