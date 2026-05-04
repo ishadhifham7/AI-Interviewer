@@ -17,9 +17,9 @@ export class CVModel {
     }
 
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    this.preferredModel =
-      process.env.GEMINI_MODEL || "gemini-3.1-flash-lite-preview";
+    this.preferredModel = process.env.GEMINI_MODEL || "gemini-2.0-flash";
   }
+  // gemini-3.1-flash-lite-preview
 
   /**
    * Send PDF bytes directly to Gemini and return structured JSON output.
