@@ -3,8 +3,9 @@ import axios from "axios";
 import CVUpload from "./pages/home";
 import Loader from "./components/ui/loader";
 import DemoPage from "./pages/demo";
+import InterviewPage from "./pages/InterviewPage";
 
-type AppPage = "home" | "loading" | "demo";
+type AppPage = "home" | "loading" | "demo" | "interview";
 
 function App() {
   const [page, setPage] = React.useState<AppPage>("home");
@@ -89,8 +90,13 @@ function App() {
           setPage("home");
           setErrorMessage("");
         }}
+        onStartInterview={() => setPage("interview")}
       />
     );
+  }
+
+  if (page === "interview") {
+    return <InterviewPage />;
   }
 
   return (
