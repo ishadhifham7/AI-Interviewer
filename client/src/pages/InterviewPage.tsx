@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import AiTalkAnimation from "../components/ui/ai-talk-animation";
+import { useUserVoiceLevel } from "../hooks/useUserVoiceLevel";
 
 const InterviewPage: React.FC = () => {
   const [isTalking, setIsTalking] = useState<boolean>(false);
-  const [isUserTalking, setIsUserTalking] = useState<boolean>(false);
 
-  // Simulation for demonstration
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsTalking((prev) => !prev);
-      setIsUserTalking((prev) => !prev);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
+  const volume = useUserVoiceLevel();
+
+  // Use raw volume directly - NO smoothing layer for instant response
+  const smooth = volume / 100;
+
+  // Threshold for talking detection
+  const isUserTalking = volume > 10;
 
   return (
     <>
@@ -45,10 +44,26 @@ const InterviewPage: React.FC = () => {
 
         {/* --- USER VOICE VISUALIZER --- */}
         <footer className="user-waveform-container">
-          <div className={`waveform ${isUserTalking ? "active" : ""}`}>
-            {[...Array(20)].map((_, i) => (
-              <div key={i} className="bar"></div>
-            ))}
+          <div className="waveform">
+            {[...Array(20)].map((_, i) => {
+              const wave = Math.sin(i * 0.8 + Date.now() * 0.002);
+
+              // Raw intensity - instant response
+              const intensity = smooth * 60;
+
+              const height = Math.max(3, 4 + Math.abs(wave) * intensity);
+
+              return (
+                <div
+                  key={i}
+                  className="bar"
+                  style={{
+                    height: `${height}px`,
+                    opacity: 0.2 + smooth,
+                  }}
+                />
+              );
+            })}
           </div>
         </footer>
       </div>
@@ -178,32 +193,18 @@ const InterviewPage: React.FC = () => {
         }
 
         .waveform {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        height: 40px;
         }
 
         .bar {
-          width: 3px;
-          height: 4px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 20px;
-          transition: all 0.2s ease;
-        }
-
-        .waveform.active .bar {
-          background: rgba(255, 255, 255, 0.6);
-          animation: wave 1.2s infinite ease-in-out;
-        }
-
-        /* Staggered animation for the bars */
-        .waveform.active .bar:nth-child(even) { animation-delay: 0.2s; }
-        .waveform.active .bar:nth-child(3n) { animation-delay: 0.4s; }
-
-        @keyframes wave {
-          0%, 100% { height: 4px; }
-          50% { height: 30px; }
+        width: 3px;
+        height: 4px;
+        background: rgb(255, 255, 255);
+        border-radius: 20px;
+        transition: height 0.08s ease, opacity 0.2s ease;
         }
 
         @keyframes pulse {
