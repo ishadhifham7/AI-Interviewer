@@ -4,6 +4,7 @@ interface DemoPageProps {
   cvData: unknown;
   fileId?: string;
   onGoHome: () => void;
+  onStartInterview: () => void;
 }
 
 type CVProject = {
@@ -108,7 +109,12 @@ const normalizeTextList = (value?: unknown[]): string[] => {
     .filter(Boolean);
 };
 
-const DemoPage: React.FC<DemoPageProps> = ({ cvData, fileId, onGoHome }) => {
+const DemoPage: React.FC<DemoPageProps> = ({
+  cvData,
+  fileId,
+  onGoHome,
+  onStartInterview,
+}) => {
   const data = asCVData(cvData);
   const normalizedSkills = normalizeTextList(data.skills);
   const normalizedEducation = normalizeTextList(data.education);
@@ -280,7 +286,7 @@ const DemoPage: React.FC<DemoPageProps> = ({ cvData, fileId, onGoHome }) => {
           <button className="demo-btn" onClick={onGoHome}>
             Back To Home
           </button>
-          <button className="demo-btn" onClick={onGoHome}>
+          <button className="demo-btn" onClick={onStartInterview}>
             Start Interview
           </button>
         </div>
