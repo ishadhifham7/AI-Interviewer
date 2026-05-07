@@ -1,12 +1,3 @@
-export type InterviewQA = {
-  question: string;
-  answer: string;
-};
-
-export type InterviewTranscript = {
-  conversation: InterviewQA[];
-};
-
 export type QuestionAnalysis = {
   question: string;
   evaluation: string;
