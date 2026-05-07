@@ -3,7 +3,7 @@ import { InterviewTranscript, Feedback } from "../core/types";
 export class MockModel {
   generateFeedback(transcript: InterviewTranscript): Feedback {
     return {
-      overall_score: 76,
+      overall_score: 90,
 
       interview_summary:
         "Candidate shows good foundational knowledge but lacks deeper technical reasoning in certain areas.",

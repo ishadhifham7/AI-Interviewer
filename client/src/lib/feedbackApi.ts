@@ -11,3 +11,13 @@ export const generateInterviewFeedback = async (): Promise<Feedback> => {
 
   return response.data.feedback;
 };
+
+type HistoryResponse = {
+  success: boolean;
+  history: any[]; // Or define the type properly
+};
+
+export const getInterviewHistory = async (): Promise<any[]> => {
+  const response = await api.get<HistoryResponse>("/feedback/history");
+  return response.data.history;
+};
