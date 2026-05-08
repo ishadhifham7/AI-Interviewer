@@ -110,7 +110,12 @@ const normalizeTextList = (value?: unknown[]): string[] => {
     .filter(Boolean);
 };
 
-const DemoPage: React.FC<DemoPageProps> = ({ cvData, fileId, interviewError, onGoHome, onStartInterview }) => {
+const DemoPage: React.FC<DemoPageProps> = ({
+  cvData,
+  fileId,
+  onGoHome,
+  onStartInterview,
+}) => {
   const data = asCVData(cvData);
   const normalizedSkills = normalizeTextList(data.skills);
   const normalizedEducation = normalizeTextList(data.education);
@@ -282,8 +287,8 @@ const DemoPage: React.FC<DemoPageProps> = ({ cvData, fileId, interviewError, onG
           <button className="demo-btn" onClick={onGoHome}>
             Back To Home
           </button>
-          <button className="demo-btn demo-btn--primary" onClick={onStartInterview}>
-            Start Interview →
+          <button className="demo-btn" onClick={onStartInterview}>
+            Start Interview
           </button>
         </div>
 
