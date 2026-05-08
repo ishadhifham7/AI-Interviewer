@@ -4,27 +4,33 @@ import CVUpload from "./pages/home";
 import Loader from "./components/ui/loader";
 import DemoPage from "./pages/demo";
 import InterviewPage from "./pages/InterviewPage";
+import FeedbackPage from "./pages/FeedbackPage";
+import api from "./lib/api";
+import { generateInterviewFeedback } from "./lib/feedbackApi";
+import { Feedback } from "./types/feedback";
 
-type AppPage = "home" | "loading" | "demo" | "interview";
+type AppPage = "home" | "loading" | "demo" | "interview" | "feedback";
 
 function App() {
   const [page, setPage] = React.useState<AppPage>("home");
   const [errorMessage, setErrorMessage] = React.useState("");
   const [cvData, setCvData] = React.useState<unknown>(null);
   const [fileId, setFileId] = React.useState("");
+  const [feedback, setFeedback] = React.useState<Feedback | null>(null);
+  const [feedbackError, setFeedbackError] = React.useState("");
+  const [isFinishing, setIsFinishing] = React.useState(false);
 
   const handleStartInterview = async (file: File) => {
     const formData = new FormData();
     formData.append("cv", file);
 
     setErrorMessage("");
+    setFeedback(null);
+    setFeedbackError("");
     setPage("loading");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/cv/upload",
-        formData,
-      );
+      const res = await api.post("/cv/upload", formData);
 
       console.log("Structured CV JSON:", res.data.cvData);
       setCvData(res.data.cvData);
@@ -42,6 +48,30 @@ function App() {
 
       setPage("home");
       console.error(err);
+    }
+  };
+
+  const handleFinishInterview = async () => {
+    setFeedbackError("");
+    setIsFinishing(true);
+
+    try {
+      const result = await generateInterviewFeedback();
+      setFeedback(result);
+      setPage("feedback");
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const apiError =
+          (err.response?.data as { error?: string } | undefined)?.error ||
+          err.message;
+        setFeedbackError(apiError);
+      } else {
+        setFeedbackError("Failed to generate feedback. Please try again.");
+      }
+
+      console.error(err);
+    } finally {
+      setIsFinishing(false);
     }
   };
 
@@ -89,6 +119,8 @@ function App() {
         onGoHome={() => {
           setPage("home");
           setErrorMessage("");
+          setFeedback(null);
+          setFeedbackError("");
         }}
         onStartInterview={() => setPage("interview")}
       />
@@ -96,7 +128,26 @@ function App() {
   }
 
   if (page === "interview") {
-    return <InterviewPage />;
+    return (
+      <InterviewPage
+        onFinishInterview={handleFinishInterview}
+        isFinishing={isFinishing}
+        finishError={feedbackError}
+      />
+    );
+  }
+
+  if (page === "feedback" && feedback) {
+    return (
+      <FeedbackPage
+        feedback={feedback}
+        onRestart={() => {
+          setPage("home");
+          setFeedback(null);
+          setFeedbackError("");
+        }}
+      />
+    );
   }
 
   return (

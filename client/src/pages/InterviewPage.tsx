@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AiTalkAnimation from "../components/ui/ai-talk-animation";
 import { useUserVoiceLevel } from "../hooks/useUserVoiceLevel";
 
-const InterviewPage: React.FC = () => {
+type InterviewPageProps = {
+  onFinishInterview: () => void;
+  isFinishing: boolean;
+  finishError?: string;
+};
+
+const InterviewPage: React.FC<InterviewPageProps> = ({
+  onFinishInterview,
+  isFinishing,
+  finishError,
+}) => {
   const [isTalking, setIsTalking] = useState<boolean>(false);
 
   const volume = useUserVoiceLevel();
@@ -24,9 +34,18 @@ const InterviewPage: React.FC = () => {
             <span className="dot"></span>
             Full-Stack Developer Intern
           </div>
-          <button className="exit-button" onClick={() => console.log("Exit")}>
-            Exit Interview
-          </button>
+          <div className="hud-actions">
+            <button
+              className="finish-button"
+              onClick={onFinishInterview}
+              disabled={isFinishing}
+            >
+              {isFinishing ? "Generating Feedback..." : "Finish Interview"}
+            </button>
+            <button className="exit-button" onClick={() => console.log("Exit")}>
+              Exit Interview
+            </button>
+          </div>
         </header>
 
         {/* --- MAIN CONTENT --- */}
@@ -38,8 +57,14 @@ const InterviewPage: React.FC = () => {
           </div>
 
           <div className="status-text">
-            {isTalking ? "AI is speaking..." : "Listening..."}
+            {isFinishing
+              ? "Compiling your feedback..."
+              : isTalking
+                ? "AI is speaking..."
+                : "Listening..."}
           </div>
+
+          {finishError && <div className="status-error">{finishError}</div>}
         </main>
 
         {/* --- USER VOICE VISUALIZER --- */}
@@ -138,6 +163,36 @@ const InterviewPage: React.FC = () => {
           transform: translateY(-2px);
         }
 
+        .hud-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .finish-button {
+          background: #ffbf48;
+          color: #1a1a1a;
+          border: 1px solid rgba(255, 191, 72, 0.6);
+          padding: 0.6rem 1.2rem;
+          border-radius: 8px;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 600;
+          min-width: 160px;
+        }
+
+        .finish-button:hover {
+          background: #ffd37d;
+          transform: translateY(-2px);
+        }
+
+        .finish-button:disabled {
+          opacity: 0.65;
+          cursor: not-allowed;
+          transform: none;
+        }
+
         /* --- CONTENT STYLES --- */
         .background-glow {
           position: absolute;
@@ -183,6 +238,14 @@ const InterviewPage: React.FC = () => {
           animation: pulse 2.5s infinite;
         }
 
+        .status-error {
+          margin-top: -20px;
+          color: #f87171;
+          font-size: 0.85rem;
+          letter-spacing: 0.05em;
+          text-transform: none;
+        }
+
         /* --- USER WAVEFORM --- */
         .user-waveform-container {
           position: absolute;
@@ -221,6 +284,8 @@ const InterviewPage: React.FC = () => {
           .interview-hud { padding: 1.5rem; }
           .role-tag { font-size: 0.7rem; }
           .exit-button { font-size: 0.7rem; }
+          .finish-button { font-size: 0.7rem; min-width: 0; }
+          .hud-actions { flex-direction: column; align-items: flex-end; }
         }
       `}</style>
     </>

@@ -4,6 +4,10 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import routes from "./routes";
+import {
+  generateFeedback,
+  getFeedbackHistory,
+} from "./modules/feedback-agent/feedbackController";
 import { errorHandler } from "./middlewares/errorHandler";
 
 const app: Application = express();
@@ -25,6 +29,8 @@ app.get("/health", (_req, res) => {
 
 // Routes
 app.use("/api", routes);
+app.post("/api/feedback/generate", generateFeedback);
+app.get("/api/feedback/history", getFeedbackHistory);
 
 // Global Error Handler
 app.use(errorHandler);
