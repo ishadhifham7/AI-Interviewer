@@ -155,7 +155,8 @@ const Dashboard: React.FC<HomeProps> = ({
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
         .layout-page {
-          min-height: 100vh;
+          height: 100vh;
+          overflow: hidden;
           background-color: #050505;
           display: flex;
           flex-direction: column;
@@ -201,6 +202,14 @@ const Dashboard: React.FC<HomeProps> = ({
           display: flex;
           flex-direction: column;
           gap: 40px;
+          overflow-y: auto;
+          height: calc(100vh - 120px);
+          padding-right: 10px;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+        }
+        .dashboard-left::-webkit-scrollbar {
+          display: none; /* Chrome, Safari and Opera */
         }
 
         .greeting-text {
@@ -329,6 +338,7 @@ const Dashboard: React.FC<HomeProps> = ({
           display: flex;
           justify-content: center;
           align-items: flex-start;
+          height: fit-content;
         }
 
         .cv-card {
