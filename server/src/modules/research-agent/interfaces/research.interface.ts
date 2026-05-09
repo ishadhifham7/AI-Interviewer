@@ -13,3 +13,9 @@ export interface SourceFinderInput {
   companyName: string;
   role: string;
 }
+
+export interface RetrievedContent {
+  source: ResearchSourceType;
+  url: string;
+  content: string;
+}
