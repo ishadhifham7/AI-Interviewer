@@ -17,7 +17,10 @@ export const findCompanySources = async ({
     `${companyName} engineering blog`,
     `${companyName} company culture`,
     `${companyName} ${role}`,
-  ];
+  ].filter((query) => {
+    const lower = query.toLowerCase();
+    return !lower.includes("linkedin");
+  });
 
   // Prevent duplicate URLs
   const uniqueSources = new Map<string, ResearchSource>();
@@ -45,7 +48,7 @@ export const findCompanySources = async ({
           normalizedUrl.includes("facebook") ||
           normalizedUrl.includes("instagram") ||
           normalizedUrl.includes("twitter") ||
-          normalizedUrl.includes("linkedin.com/posts")
+          normalizedUrl.includes("linkedin")
         ) {
           continue;
         }
