@@ -37,3 +37,51 @@ export interface GenerateInterviewBody {
     experience_level?: "junior" | "mid" | "senior";
   };
 }
+
+// ── Per-Answer Live Score ────────────────────────────────────────────────────
+
+export interface LiveScore {
+  clarity: number; // 0-10
+  relevance: number; // 0-10
+  depth: number; // 0-10
+  overall: number; // weighted average
+  feedback: string; // one-line AI comment
+}
+
+// ── Answer Entry ─────────────────────────────────────────────────────────────
+
+export interface AnswerEntry {
+  questionId: number;
+  question: string;
+  answer: string;
+  score?: LiveScore;
+  answeredAt: string;
+}
+
+// ── Active Interview Session (stateful) ──────────────────────────────────────
+
+export interface ActiveInterviewSession {
+  sessionId: string;
+  candidateName: string;
+  targetRole: string;
+  experience_level: "junior" | "mid" | "senior";
+  questions: InterviewQuestion[];
+  answers: AnswerEntry[];
+  currentQuestionIndex: number;
+  status: "active" | "completed";
+  startedAt: string;
+  completedAt?: string;
+}
+
+// ── Request Bodies ───────────────────────────────────────────────────────────
+
+export interface StartSessionBody {
+  cvData: GenerateInterviewBody["cvData"];
+  targetRole?: string;
+}
+
+export interface SubmitAnswerBody {
+  questionId: number;
+  answer: string;
+}
+
