@@ -1,25 +1,18 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
+import { OllamaClient } from "../../shared/aiClient/ollamaClient";
 import { buildInterviewPrompt } from "./interviewAIPrompt";
 import { InterviewParser } from "./interviewParser";
 import { GenerateInterviewBody, InterviewSession } from "../interviewTypes";
-dotenv.config();
 
 export class InterviewAIModel {
-  private genAI: GoogleGenerativeAI;
-  private modelName: string;
+  private client: OllamaClient;
 
   constructor() {
-    const apiKey = process.env.GEMINI_INTERVIEW_API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_INTERVIEW_API_KEY not set in environment variables");
-    }
-
-    console.log("[InterviewModel] Using API key: GEMINI_INTERVIEW_API_KEY");
-    this.genAI = new GoogleGenerativeAI(apiKey);
-    this.modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+    this.client = new OllamaClient();
+    console.log(
+      "[InterviewModel] Using Gemma 4 via Ollama at:",
+      process.env.OLLAMA_BASE_URL || "http://localhost:11434",
+    );
   }
-
 
   //Generate an interview session using the CV data.
 
@@ -32,10 +25,9 @@ export class InterviewAIModel {
     let lastError: unknown;
 
     try {
-      const model = this.genAI.getGenerativeModel({ model: this.modelName });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const rawText = response.text();
+      const rawText = await this.client.generate(prompt, {
+        temperature: 0.7,
+      });
 
       const questions = InterviewParser.parse(rawText);
 
@@ -52,10 +44,10 @@ export class InterviewAIModel {
       };
     } catch (error: any) {
       lastError = error;
-      console.error(`[InterviewModel] Model ${this.modelName} failed:`, error);
+      console.error("[InterviewModel] Gemma 4 generation failed:", error);
     }
 
-    console.error("[InterviewModel] API Error:", (lastError as any)?.message || lastError);
+    console.error("[InterviewModel] Error:", (lastError as any)?.message || lastError);
 
     const aiError = new Error("Failed to generate interview questions") as Error & {
       statusCode?: number;
@@ -63,26 +55,14 @@ export class InterviewAIModel {
 
     const errorMessage = String((lastError as any)?.message || "");
 
-    if (
-      (lastError as any)?.status === 429 ||
-      errorMessage.includes("RESOURCE_EXHAUSTED") ||
-      errorMessage.includes("quota")
-    ) {
+    if (errorMessage.includes("ECONNREFUSED") || errorMessage.includes("Cannot reach")) {
       aiError.statusCode = 503;
       aiError.message =
-        "Interview AI service quota exceeded. Please check GEMINI_INTERVIEW_API_KEY billing/quota and retry.";
-    } else if (
-      (lastError as any)?.status === 503 ||
-      errorMessage.includes("UNAVAILABLE") ||
-      errorMessage.includes("high demand")
-    ) {
-      aiError.statusCode = 503;
-      aiError.message =
-        "Interview AI model is temporarily unavailable. Please retry in a few moments.";
-    } else if ((lastError as any)?.status === 404) {
+        "Cannot reach Ollama server. Ensure Ollama is running with: ollama serve";
+    } else if (errorMessage.includes("not found")) {
       aiError.statusCode = 500;
       aiError.message =
-        "No supported Gemini model was found. Set GEMINI_MODEL to a valid model name.";
+        "Gemma model not found in Ollama. Pull it with: ollama pull gemma3";
     } else {
       aiError.statusCode = 500;
     }
