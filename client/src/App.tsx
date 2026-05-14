@@ -20,6 +20,7 @@ function App() {
   const [feedbackError, setFeedbackError] = React.useState("");
   const [isFinishing, setIsFinishing] = React.useState(false);
 
+  // ── Upload CV ──────────────────────────────────────────────────────────────
   const handleStartInterview = async (file: File) => {
     const formData = new FormData();
     formData.append("cv", file);
@@ -39,13 +40,11 @@ function App() {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const apiError =
-          (err.response?.data as { error?: string } | undefined)?.error ||
-          err.message;
+          (err.response?.data as { error?: string } | undefined)?.error || err.message;
         setErrorMessage(apiError);
       } else {
         setErrorMessage("Upload failed. Please try again.");
       }
-
       setPage("home");
       console.error(err);
     }
@@ -116,6 +115,7 @@ function App() {
       <DemoPage
         cvData={cvData}
         fileId={fileId}
+        interviewError={interviewError}
         onGoHome={() => {
           setPage("home");
           setErrorMessage("");
@@ -151,10 +151,7 @@ function App() {
   }
 
   return (
-    <CVUpload
-      onStartInterview={handleStartInterview}
-      errorMessage={errorMessage}
-    />
+    <CVUpload onStartInterview={handleStartInterview} errorMessage={errorMessage} />
   );
 }
 

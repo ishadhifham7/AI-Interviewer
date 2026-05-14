@@ -3,6 +3,7 @@ import React from "react";
 interface DemoPageProps {
   cvData: unknown;
   fileId?: string;
+  interviewError?: string;
   onGoHome: () => void;
   onStartInterview: () => void;
 }
@@ -290,6 +291,10 @@ const DemoPage: React.FC<DemoPageProps> = ({
             Start Interview
           </button>
         </div>
+
+        {interviewError && (
+          <p className="interview-error">{interviewError}</p>
+        )}
       </div>
 
       <style>{`
@@ -508,6 +513,23 @@ const DemoPage: React.FC<DemoPageProps> = ({
         .demo-btn:hover {
           background: #e5e5e5;
           transform: translateY(-1px);
+        }
+
+        .demo-btn--primary {
+          background: linear-gradient(135deg, #3b82f6, #6366f1);
+          color: #fff;
+        }
+
+        .demo-btn--primary:hover {
+          background: linear-gradient(135deg, #2563eb, #4f46e5);
+          transform: translateY(-1px);
+        }
+
+        .interview-error {
+          margin: 4px 0 0;
+          text-align: center;
+          color: #f87171;
+          font-size: 13px;
         }
 
         @media (max-width: 980px) {
